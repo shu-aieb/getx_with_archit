@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:getx_with_archit/app/core/exception/network_exception.dart';
 import 'package:getx_with_archit/app/data/models/response_model.dart';
 import 'package:getx_with_archit/app/data/providers/api_provider.dart';
 
@@ -50,11 +51,8 @@ class ApiServices {
           'Request failed with status :  ${response.statusCode}',
         );
       }
-    } on DioException catch (e) {
-      return ApiResponse.error(
-        e.message ?? 'Network error occurred',
-        statusCode: e.response?.statusCode,
-      );
+    } on NetworkException catch (e) {
+      return ApiResponse.error(e.message);
     } catch (e) {
       return ApiResponse.error('Unexpected error : $e');
     }

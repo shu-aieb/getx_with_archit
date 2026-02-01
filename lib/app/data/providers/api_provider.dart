@@ -2,6 +2,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart' as getx;
 import 'package:getx_with_archit/app/core/constants/api_constants.dart';
+import 'package:getx_with_archit/app/core/exception/network_exception.dart';
 import 'package:getx_with_archit/app/data/services/storage_services.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
@@ -44,16 +45,12 @@ class ApiProvider {
 
           // Adding Language Headers
           final language = _storageService.language ?? 'en';
-          options.headers[ApiConstants.authorization] = language;
+          options.headers[ApiConstants.acceptLanguage] = language;
 
           // check connectivity
           final connectivity = Connectivity().checkConnectivity();
           if (connectivity == ConnectivityResult.none) {
-            throw DioException(
-              requestOptions: options,
-              error: 'No Internet Connection',
-              type: DioExceptionType.connectionError,
-            );
+            throw NetworkException('No Internet Connection');
           }
           handler.next(options);
         },
@@ -177,7 +174,7 @@ class ApiProvider {
     }
   }
 
-  _handleError(dynamic error) {
+  Exception _handleError(dynamic error) {
     if (error is DioException) {
       switch (error.type) {
         case DioExceptionType.connectionTimeout:
@@ -196,9 +193,10 @@ class ApiProvider {
           return Exception('Something Went Wrong');
       }
     }
+    return Exception('Something Went Wrong');
   }
 
-  _handleStatusCode(int? statusCode) {
+  String _handleStatusCode(int? statusCode) {
     switch (statusCode) {
       case 400:
         return 'Bad Request';
