@@ -3,15 +3,19 @@ import 'package:get/get.dart';
 import 'package:getx_with_archit/app/data/models/user_model.dart';
 import 'package:getx_with_archit/app/modules/home_screen/controller/home_controller.dart';
 import 'package:getx_with_archit/app/modules/home_screen/views/widgets/user_card.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class HomeView extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('User List'),
+        title: Text(
+          'User List',
+          style: GoogleFonts.mochiyPopPOne(color: Colors.white),
+        ),
         centerTitle: true,
-        backgroundColor: Colors.pink.shade500,
+        backgroundColor: Colors.blue.shade500,
       ),
       body: Column(
         children: [

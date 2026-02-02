@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:getx_with_archit/app/data/models/user_model.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -22,17 +24,35 @@ class UserCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: Colors.yellow[200],
+          backgroundColor: Colors.blue.shade100,
           child: Text(
-            user.name!.isNotEmpty ? user.name![0].toUpperCase() : '?',
-            style: const TextStyle(fontWeight: FontWeight.bold),
+            user.name != null
+                ? user.name!.isNotEmpty
+                      ? user.name!
+                            .substring(0, min(3, user.name!.length))
+                            .toUpperCase()
+                      : '?'
+                : '...',
+            style: GoogleFonts.playwritePe(
+              fontWeight: FontWeight.bold,
+              fontSize: 8,
+              color: Colors.blue.shade700,
+            ),
           ),
         ),
         title: Text(
           user.name.toString(),
-          style: const TextStyle(fontWeight: FontWeight.w500),
+          overflow: TextOverflow.ellipsis,
+          style: GoogleFonts.playwritePe(
+            fontWeight: FontWeight.w500,
+            fontSize: 15,
+            color: Colors.blue.shade800,
+          ),
         ),
-        subtitle: Text(user.email.toString()),
+        subtitle: Text(
+          user.email.toString(),
+          style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w300),
+        ),
         trailing: IconButton(
           onPressed: onDelete,
           icon: const Icon(Icons.delete, color: Colors.red),
@@ -69,46 +89,80 @@ class UserDetailsSheet extends StatelessWidget {
           Expanded(
             child: SingleChildScrollView(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CircleAvatar(
-                    radius: 40,
-                    backgroundColor: Colors.brown[100],
-                    child: Text(
-                      user.name!.isNotEmpty ? user.name![0].toUpperCase() : '?',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 24,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      CircleAvatar(
+                        radius: 30,
+                        backgroundColor: Colors.blue.shade100,
+                        child: Text(
+                          user.name!.isNotEmpty
+                              ? user.name!
+                                    .substring(0, min(3, user.name!.length))
+                                    .toUpperCase()
+                              : '?',
+                          style: GoogleFonts.playwritePe(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 12,
+                            color: Colors.blue.shade700,
+                          ),
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 16),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            user.name!.toString(),
+                            style: GoogleFonts.playwritePe(
+                              color: Colors.blue.shade800,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            user.email!.toString(),
+                            style: GoogleFonts.poppins(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w300,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    user.name!.toString(),
-                    style: GoogleFonts.playwritePe(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    user.email!.toString(),
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w300,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    'Address : ',
-                    style: GoogleFonts.mochiyPopOne(
-                      fontWeight: FontWeight.normal,
-                      color: Colors.grey.shade500,
-                      fontSize: 18,
-                    ),
-                  ),
+                  const SizedBox(height: 15),
+                  Divider(color: Colors.grey.shade300, thickness: 2),
                   const SizedBox(height: 10),
+                  _segmentHeading('Address : '),
+                  const SizedBox(height: 8),
                   userAddressTable(),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 15),
+                  Divider(color: Colors.grey.shade300, thickness: 2),
+                  const SizedBox(height: 10),
+                  _segmentHeading('Contact Information : '),
+                  const SizedBox(height: 8),
+                  _contactInformationTable([
+                    ['Phone :', user.phone ?? ''],
+                    ['Email :', user.email ?? ''],
+                  ]),
+                  const SizedBox(height: 15),
+                  Divider(color: Colors.grey.shade300, thickness: 2),
+                  const SizedBox(height: 10),
+                  _segmentHeading('Company : '),
+                  const SizedBox(height: 8),
+                  _contactInformationTable([
+                    ['Name :', user.company!.name ?? ''],
+                    ['Catch Phrase :', user.company!.catchPhrase ?? ''],
+                    ['Bs :', user.company!.bs ?? ''],
+                  ]),
+                  const SizedBox(height: 15),
+                  Divider(color: Colors.grey.shade300, thickness: 2),
+                  const SizedBox(height: 10),
 
                   ElevatedButton(
                     onPressed: () => Navigator.pop(context),
@@ -119,9 +173,9 @@ class UserDetailsSheet extends StatelessWidget {
                       ),
                       elevation: 4,
                     ),
-                    child: const Text(
+                    child: Text(
                       'Close',
-                      style: TextStyle(color: Colors.white),
+                      style: GoogleFonts.padauk(color: Colors.white),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -134,106 +188,191 @@ class UserDetailsSheet extends StatelessWidget {
     );
   }
 
-  Widget userAddressTable() {
+  Widget _contactInformationTable(List<List<String>> info) {
     return Table(
-      border: TableBorder.all(),
+      border: TableBorder.all(color: Colors.blue.shade700),
       columnWidths: const <int, TableColumnWidth>{
         0: FlexColumnWidth(0.5),
         1: FlexColumnWidth(1.0),
       },
-      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-      children: <TableRow>[
-        TableRow(
-          children: [
-            TableCell(
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 5,
-                  horizontal: 10,
-                ),
-                color: Colors.lightBlueAccent.shade400,
-                child: Text('Street : '),
+      children: [
+        //_buildAddressRow('Phone', user.phone ?? '', false),
+        ...info.asMap().entries.map((i) {
+          int index = i.key;
+          List<String> value = i.value;
+          return _buildAddressRow(value[0], value[1], index % 2 != 0);
+        }),
+        //_buildAddressRow('Website', user.website ?? '', true),
+      ],
+    );
+  }
+
+  Widget userAddressTable() {
+    Address? address = user.address;
+    return address == null
+        ? const Expanded(child: Text('No Address Found'))
+        : Table(
+            border: TableBorder.all(color: Colors.blue.shade700),
+            columnWidths: const <int, TableColumnWidth>{
+              0: FlexColumnWidth(0.5),
+              1: FlexColumnWidth(1.0),
+            },
+            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+            children: <TableRow>[
+              _buildAddressRow('Street : ', address.street ?? '', false),
+              _buildAddressRow('Suite : ', address.suite ?? '', true),
+              _buildAddressRow('City : ', address.city ?? '', false),
+              _buildAddressRow('Zip Code : ', address.zipcode ?? '', true),
+              TableRow(
+                children: [
+                  TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.fill,
+                    child: Container(
+                      padding: const EdgeInsets.only(left: 10),
+                      alignment: Alignment.centerLeft,
+                      color: Colors.blue.shade300,
+                      child: Text('Geo : ', style: tableCellTextStyle()),
+                    ),
+                  ),
+                  TableCell(
+                    child: Column(
+                      children: [
+                        Container(
+                          color: Colors.blue.shade200,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                flex: 3,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 3,
+                                  ),
+                                  child: Text(
+                                    'Lat',
+                                    style: tableCellTextStyle(),
+                                  ),
+                                ),
+                              ),
+
+                              Container(
+                                color: Colors.blue.shade700,
+                                width: 1,
+                                height: 25,
+                              ),
+                              Expanded(
+                                flex: 7,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 3,
+                                  ),
+                                  child: Text(
+                                    address.geo!.lat ?? '',
+                                    style: tableCellTextStyle(),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          color: Colors.blue.shade700,
+                          height: 1,
+                          width: double.infinity,
+                        ),
+
+                        //
+                        Container(
+                          color: Colors.blue.shade100,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                flex: 3,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 3,
+                                  ),
+                                  child: Text(
+                                    'Lng',
+                                    style: tableCellTextStyle(),
+                                  ),
+                                ),
+                              ),
+
+                              Container(
+                                color: Colors.blue.shade700,
+                                width: 1,
+                                height: 25,
+                              ),
+                              Expanded(
+                                flex: 7,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 3,
+                                  ),
+                                  child: Text(
+                                    address.geo!.lng ?? '',
+                                    style: tableCellTextStyle(),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
+            ],
+          );
+  }
+
+  TableRow _buildAddressRow(String label, String value, bool isLight) {
+    final color = isLight ? Colors.white : Colors.blue.shade300;
+    return TableRow(
+      children: [
+        TableCell(
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+            color: color,
+            child: Text(
+              label,
+              overflow: TextOverflow.ellipsis,
+              style: tableCellTextStyle(),
             ),
-            TableCell(
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 5,
-                  horizontal: 10,
-                ),
-                color: Colors.lightBlueAccent.shade400,
-                child: Text(
-                  user.address!.street ?? '',
-                  style: TextStyle(overflow: TextOverflow.ellipsis),
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
-        TableRow(
-          children: [
-            TableCell(
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 5,
-                  horizontal: 10,
-                ),
-                color: Colors.white,
-                child: Text('Suite : '),
-              ),
+        TableCell(
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+            color: color,
+            child: Text(
+              value,
+              overflow: TextOverflow.ellipsis,
+              style: tableCellTextStyle().copyWith(fontWeight: FontWeight.w100),
             ),
-            TableCell(
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 5,
-                  horizontal: 10,
-                ),
-                color: Colors.white,
-                child: Text(
-                  user.address!.suite ?? '',
-                  style: TextStyle(overflow: TextOverflow.ellipsis),
-                ),
-              ),
-            ),
-          ],
-        ),
-        TableRow(
-          children: [
-            TableCell(
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 5,
-                  horizontal: 10,
-                ),
-                color: Colors.lightBlueAccent.shade400,
-                child: Text(
-                  'City : ',
-                  overflow: TextOverflow.ellipsis,
-                  style: tableCellTextStyle(),
-                ),
-              ),
-            ),
-            TableCell(
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 5,
-                  horizontal: 10,
-                ),
-                color: Colors.lightBlueAccent.shade400,
-                child: Text(
-                  user.address!.street ?? '',
-                  overflow: TextOverflow.ellipsis,
-                  style: tableCellTextStyle(),
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
       ],
     );
   }
 
   TextStyle tableCellTextStyle() {
-    return GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600);
+    return GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w500);
+  }
+
+  Text _segmentHeading(String label) {
+    return Text(
+      label,
+      style: GoogleFonts.deliusSwashCaps(
+        fontWeight: FontWeight.normal,
+        color: Colors.grey.shade900,
+        fontSize: 18,
+      ),
+    );
   }
 }
